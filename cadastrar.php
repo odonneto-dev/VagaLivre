@@ -50,11 +50,13 @@ function validarSenha_old($senha) {
 }
 
 
-function validarSenha($senha, $exigirMaiuscula = true, $exigirNumero = true, $exigirSimbolo = true, $minimoCaracteres = 8) {
-    // A base da regex: garante o tamanho mínimo
+function validarSenha($senha, $exigirMinuscula = false, $exigirMaiuscula = false, $exigirNumero = false, $exigirSimbolo = false, $minimoCaracteres = 8) {
     $regras = "";
 
-    // Adiciona "Lookaheads" condicionais conforme os parâmetros
+    // Adiciona "Lookaheads" apenas se o parâmetro for true
+    if ($exigirMinuscula) {
+        $regras .= "(?=.*[a-z])";
+    }
     if ($exigirMaiuscula) {
         $regras .= "(?=.*[A-Z])";
     }
@@ -65,8 +67,8 @@ function validarSenha($senha, $exigirMaiuscula = true, $exigirNumero = true, $ex
         $regras .= "(?=.*[!@#$%^&*(),.?\":{}|<>])";
     }
 
-    // Monta a regex final (sempre exigindo ao menos uma minúscula por padrão)
-    $padrao = "/^(?=.*[a-z])" . $regras . ".{" . $minimoCaracteres . ",}$/";
+    // Monta a regex: sem a minúscula fixa, apenas o tamanho mínimo e as regras opcionais
+    $padrao = "/^" . $regras . ".{" . $minimoCaracteres . ",}$/";
 
     return preg_match($padrao, $senha);
 }
@@ -89,7 +91,7 @@ if (!empty($_POST['email'])) {
         $confsenha_pura = $_POST['confsenha'];
         
         // Validação da força da senha
-        if (!validarSenha($senha_pura, false, false, false, 8))
+        if (!validarSenha($senha_pura, false, false, false, false, 8))
             $status = 3; // Senha fraca
     
         // Validação de igualdade

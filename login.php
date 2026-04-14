@@ -659,7 +659,7 @@ if (!empty($_POST['email']))
 <?php if (@$_GET['cd_st']==3){ ?>
     Swal.fire({
         title: "Senha muito fraca",
-        text: "A senha precisa ter pelo menos 1 simbolo, 1 letra maiuscula, 1 letra minúscula, 1 número e 8 caracteres !",
+        text: "A senha precisa ter pelo menos 8 caracteres !",
         icon: "error"
     });
 <?php } ?>
