@@ -37,17 +37,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>VagaLivre - Redefinir Senha</title>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;800&display=swap" rel="stylesheet">
+
     <style>
-        * { box-sizing: border-box; }
-        
+        :root {
+            --primary-dark: #2b5876;
+            --accent-green: #2ecc71;
+            --white: #FFFFFF;
+            --gray-bg: #f8f9fa;
+            --text-dark: #2b5876;
+        }
+
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+        }
+
         body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #1a1a2e 100%);
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--gray-bg);
+            color: var(--text-dark);
             height: 100vh;
             display: flex;
             justify-content: center;
@@ -61,28 +75,52 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             padding: 40px;
             border-radius: 25px;
             text-align: center;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border-bottom: 5px solid var(--accent-green);
         }
 
-        .logo {
+        /* LOGO PADRONIZADA COM PINGO VERDE */
+        .logo-container {
             display: flex;
-            justify-content: center;
             align-items: center;
-            gap: 10px;
-            font-size: 26px;
-            font-weight: 800;
-            color: #1A2B4D;
-            margin-bottom: 5px;
+            justify-content: center;
+            margin-bottom: 10px;
         }
 
-        .logo i { color: #1A2B4D; }
-        .logo span { color: #2DAB61; }
+        .logo-icon {
+            font-size: 26px;
+            color: var(--primary-dark);
+            margin-right: 8px;
+            position: relative;
+        }
+
+        .logo-icon::after {
+            content: '';
+            position: absolute;
+            top: 0; right: -2px; width: 6px; height: 6px;
+            background-color: var(--accent-green);
+            border-radius: 50%; border: 2px solid var(--white);
+        }
+
+        .logo-text {
+            font-size: 24px; 
+            font-weight: 800; 
+            color: var(--primary-dark); 
+            letter-spacing: -1px;
+        }
+
+        .logo-text span { 
+            color: var(--accent-green); 
+            font-weight: 600; 
+        }
 
         h2 {
-            font-size: 18px;
-            color: #333;
-            margin-bottom: 25px;
-            font-weight: 700;
+            font-size: 16px;
+            color: #888;
+            margin-bottom: 30px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .form-group {
@@ -91,58 +129,77 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         .form-group input {
             width: 100%;
-            padding: 14px 20px;
+            padding: 15px 20px;
             border: none;
-            background-color: #f1f3f5;
+            background-color: #f0f2f5;
             border-radius: 12px;
+            font-family: 'Montserrat', sans-serif;
             font-size: 14px;
-            color: #495057;
+            color: var(--text-dark);
             outline: none;
-        }
-
-        .btn-entrar {
-            width: 60%;
-            padding: 12px;
-            margin-top: 10px;
-            border: none;
-            border-radius: 25px;
-            background: linear-gradient(to right, #2c3e50, #000000);
-            color: white;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
             transition: 0.3s;
         }
 
-        .btn-entrar:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        .form-group input:focus {
+            background-color: #fff;
+            box-shadow: 0 0 0 2px var(--accent-green);
+        }
+
+        /* BOTÃO SEM DEGRADÊ - VERDE SÓLIDO */
+        .btn-redefinir {
+            width: 100%;
+            padding: 14px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 30px;
+            background-color: var(--accent-green);
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+            font-family: 'Montserrat', sans-serif;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-redefinir:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+            opacity: 0.9;
         }
 
         .error-msg {
             background: #f8d7da;
             color: #721c24;
-            padding: 10px;
-            border-radius: 8px;
+            padding: 12px;
+            border-radius: 10px;
             font-size: 13px;
-            margin-bottom: 15px;
+            font-weight: 600;
+            margin-bottom: 20px;
         }
 
-        /* Botão para voltar se desistir de mudar a senha */
         .btn-voltar {
-            display: block;
-            margin-top: 20px;
-            color: #777;
+            display: inline-block;
+            margin-top: 25px;
+            color: var(--accent-green);
             text-decoration: none;
-            font-size: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .btn-voltar:hover {
+            opacity: 0.7;
         }
     </style>
 </head>
 <body>
 
     <div class="card">
-        <div class="logo">
-            <i class="fa-solid fa-car-side"></i> Vaga<span>Livre</span>
+        <div class="logo-container">
+            <i class="fas fa-car-side logo-icon"></i>
+            <div class="logo-text">Vaga<span>Livre</span></div>
         </div>
         
         <h2>Redefinir senha</h2>
@@ -153,7 +210,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         <form method="POST">
             <div class="form-group">
-                <input type="email" name="email" placeholder="Seu e-mail cadastrado" required>
+                <input type="email" name="email" placeholder="E-mail cadastrado" required>
             </div>
 
             <div class="form-group">
@@ -164,10 +221,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <input type="password" name="confirmar_senha" placeholder="Confirmar nova senha" required>
             </div>
 
-            <button type="submit" class="btn-entrar">REDEFINIR</button>
+            <button type="submit" class="btn-redefinir">Redefinir Agora</button>
         </form>
 
-        <a href="login.php" class="btn-voltar">Voltar para o login</a>
+        <a href="login.php" class="btn-voltar">
+            <i class="fas fa-chevron-left"></i> Voltar para o login
+        </a>
     </div>
 
 </body>
