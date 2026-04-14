@@ -574,7 +574,7 @@ if (!empty($_POST['email']))
             </div>
             <h1>Criar Conta</h1>
             <input type="text" name="nome" placeholder="Nome" />
-            <input type="text" name="whatsapp" placeholder="Whatsapp" />
+            <input type="text" name="whatsapp" placeholder="Telefone" />
             <input type="email" name="email" placeholder="Email" />
             <input type="password" name="senha" placeholder="Senha" />
             <input type="password" name="confsenha" placeholder="Confirmação de Senha" />

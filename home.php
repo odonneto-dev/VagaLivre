@@ -159,12 +159,21 @@ include("restrito.php");
             transform: translateY(-5px);
         }
 
-        .card-image {
+       .card-image {
             width: 100%;
             height: 100%;
-            background-image: url('img/av-vidal.jpg'); 
+            /* Camada de gradiente escuro + Imagem */
+            background-image: 
+                linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.7) 100%), 
+                url('img/av-vidal.jpg'); 
             background-size: cover;
             background-position: center;
+            transition: transform 0.6s ease;
+        }
+
+        /* Efeito de Zoom na foto ao passar o mouse */
+        .area-card:hover .card-image {
+            transform: scale(1.1);
         }
 
         /* Camada de labels sobre a imagem */

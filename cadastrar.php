@@ -36,7 +36,7 @@ error_reporting(E_ALL);
 
 
 
-function validarSenha($senha) {
+function validarSenha_old($senha) {
     // Regras:
     // (?=.*[a-z]) : Pelo menos uma letra minúscula
     // (?=.*[A-Z]) : Pelo menos uma letra maiúscula
@@ -45,6 +45,28 @@ function validarSenha($senha) {
     // .{8,}       : No mínimo 8 caracteres no total
     
     $padrao = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/';
+
+    return preg_match($padrao, $senha);
+}
+
+
+function validarSenha($senha, $exigirMaiuscula = true, $exigirNumero = true, $exigirSimbolo = true, $minimoCaracteres = 8) {
+    // A base da regex: garante o tamanho mínimo
+    $regras = "";
+
+    // Adiciona "Lookaheads" condicionais conforme os parâmetros
+    if ($exigirMaiuscula) {
+        $regras .= "(?=.*[A-Z])";
+    }
+    if ($exigirNumero) {
+        $regras .= "(?=.*[0-9])";
+    }
+    if ($exigirSimbolo) {
+        $regras .= "(?=.*[!@#$%^&*(),.?\":{}|<>])";
+    }
+
+    // Monta a regex final (sempre exigindo ao menos uma minúscula por padrão)
+    $padrao = "/^(?=.*[a-z])" . $regras . ".{" . $minimoCaracteres . ",}$/";
 
     return preg_match($padrao, $senha);
 }
@@ -67,7 +89,7 @@ if (!empty($_POST['email'])) {
         $confsenha_pura = $_POST['confsenha'];
         
         // Validação da força da senha
-        if (!validarSenha($senha_pura))
+        if (!validarSenha($senha_pura, false, false, false, 8))
             $status = 3; // Senha fraca
     
         // Validação de igualdade
