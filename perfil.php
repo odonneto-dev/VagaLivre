@@ -48,7 +48,7 @@ $user = $result->fetch_assoc();
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;800&display=swap" rel="stylesheet">
 
     <style>
-        /* VARIÁVEIS EXATAMENTE IGUAIS À HOME */
+        /* váriaveis */
         :root {
             --primary-dark: #2b5876;
             --accent-green: #2ecc71;
@@ -71,7 +71,7 @@ $user = $result->fetch_assoc();
             padding: 0 20px;
         }
 
-        /* HEADER IDENTICO À HOME */
+        /* header padrão */
         .main-header {
             padding: 15px 0;
             border-bottom: 1px solid #eee;
@@ -122,7 +122,7 @@ $user = $result->fetch_assoc();
             color: var(--accent-green);
         }
 
-        /* CONTEÚDO ESPECÍFICO DO PERFIL */
+        /* conteúdo do perfil */
         .content {
             display: flex;
             flex-direction: column;
