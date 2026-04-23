@@ -10,6 +10,8 @@ ob_start();
 session_destroy();
 
 
+
+
 if (!empty($_POST['email']))
     $login=stripslashes(trim($_POST['email']));
 if (empty($_POST['senha']))
@@ -103,7 +105,7 @@ if (!empty($_POST['email'])) {
             $nome = $_POST['nome'];
             $email = $_POST['email'];
             $senha = sha1(md5($senha_pura));
-            $whatsapp = $_POST['whatsapp'];
+            $whatsapp = $_POST['telefone'];
 
             $sql = "INSERT INTO usuario (nome, email, senha, telefone) VALUES ('$nome', '$email', '$senha', '$whatsapp')";
             $result = $mysqli->query($sql);
@@ -136,6 +138,6 @@ if (!empty($_POST['email'])) {
 }
 
 
-header('Location: ./login.php?cd_st='.$status);
+echo json_encode($status);
 
 ?>

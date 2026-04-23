@@ -567,18 +567,18 @@ if (!empty($_POST['email']))
 <div class="container" id="container">
     
     <div class="form-container sign-up-container">
-        <form action="cadastrar.php" method="POST">
+        <form>
             <div class="logo-container">
                 <i class="fas fa-car-side logo-icon"></i>
                 <div class="logo-text">Vaga<span>Livre</span></div>
             </div>
             <h1>Criar Conta</h1>
-            <input type="text" name="nome" placeholder="Nome" />
-            <input type="text" name="whatsapp" placeholder="Telefone" />
-            <input type="email" name="email" placeholder="Email" />
-            <input type="password" name="senha" placeholder="Senha" />
-            <input type="password" name="confsenha" placeholder="Confirmação de Senha" />
-            <button>Cadastrar</button>
+            <input type="text" id="nome" placeholder="Nome" />
+            <input type="text" id="telefone" placeholder="Telefone" />
+            <input type="email" id="email" placeholder="Email" />
+            <input type="password" id="senha" placeholder="Senha" />
+            <input type="password" id="confsenha" placeholder="Confirmação de Senha" />
+            <input type="button" onclick="cadastrar();" value="Cadastrar"></input>
         </form>
     </div>
 
@@ -634,44 +634,83 @@ if (!empty($_POST['email']))
         container.classList.remove("right-panel-active");
     });
 
-<?php if (@$_GET['cd_st']==1){ ?>
-    Swal.fire({
-            title: 'Sucesso!',
-            text: 'Cadastro realizado com sucesso!',
-            icon: 'success',
-            confirmButtonText: 'Continuar',
-            confirmButtonColor: '#3085d6'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = 'home.php';
+
+
+function cadastrar(){
+  const dados = {
+    nome: $('#nome').val(),
+    email: $('#email').val(),
+    telefone: $('#telefone').val(),
+    senha: $('#senha').val(),
+    confsenha: $('#confsenha').val()
+  };
+
+
+  Swal.fire({
+    title: 'Enviando dados...',
+    text: 'Aguarde um momento',
+    allowOutsideClick: false,
+    didOpen: () => {
+      Swal.showLoading(); // Ativa o spinner de carregamento
+      
+      // Inicia o AJAX
+      $.ajax({
+        url: 'cadastrar.php',
+        method: 'POST',
+        data: dados,
+        success: function(response) {
+            console.log(response);
+            if (response=='1'){
+                Swal.fire({
+                    title: 'Sucesso!',
+                    text: 'Cadastro realizado com sucesso!',
+                    icon: 'success',
+                    confirmButtonText: 'Continuar',
+                    confirmButtonColor: '#3085d6'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = 'home.php';
+                    }
+                });
             }
-        });
-<?php } ?>
 
-<?php if (@$_GET['cd_st']==2){ ?>
-    Swal.fire({
-        title: "Email em uso",
-        text: "Esse email já está em uso!",
-        icon: "error"
-    });
-<?php } ?>
+            if (response=='2'){
+                Swal.fire({
+                    title: "Email em uso",
+                    text: "Esse email já está em uso!",
+                    icon: "error"
+                });
+            }
 
-<?php if (@$_GET['cd_st']==3){ ?>
-    Swal.fire({
-        title: "Senha muito fraca",
-        text: "A senha precisa ter pelo menos 8 caracteres !",
-        icon: "error"
-    });
-<?php } ?>
+            if (response=='3'){
+                Swal.fire({
+                    title: "Senha muito fraca",
+                    text: "A senha precisa ter pelo menos 8 caracteres !",
+                    icon: "error"
+                });
+            }
 
-<?php if (@$_GET['cd_st']==4){ ?>
-    Swal.fire({
-        title: "Senhas não conferem",
-        text: "As senhas não coincidem, tente novamente!",
-        icon: "error"
-    });
-<?php } ?>
-
+            if (response=='4'){
+                Swal.fire({
+                    title: "Senhas não conferem",
+                    text: "As senhas não coincidem, tente novamente!",
+                    icon: "error"
+                });
+            }
+        },
+        error: function(error) {
+          // Modal de Erro
+          Swal.fire({
+            icon: 'error',
+            title: 'Ops...',
+            text: 'Algo deu errado. Tente novamente mais tarde.',
+            confirmButtonColor: '#d33'
+          });
+        }
+      });
+    }
+  });
+}
 </script>
 
 </body>
