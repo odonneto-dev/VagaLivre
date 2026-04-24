@@ -37,20 +37,20 @@ ini_set('display_startup_erros',1);
 error_reporting(E_ALL);
 
 
-
-function validarSenha_old($senha) {
-    // Regras:
-    // (?=.*[a-z]) : Pelo menos uma letra minúscula
-    // (?=.*[A-Z]) : Pelo menos uma letra maiúscula
-    // (?=.*[0-9]) : Pelo menos um número
-    // (?=.*[!@#$%^&*(),.?":{}|<>]) : Pelo menos um caractere especial
-    // .{8,}       : No mínimo 8 caracteres no total
-    
-    $padrao = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/';
-
-    return preg_match($padrao, $senha);
+function validaTelefone($telefone){
+    if (preg_match('/^[0-9]{8,11}$/', $telefone))
+        return true;
+    else
+        return false;
 }
 
+function validaEmail($email){
+    if (filter_var($email, FILTER_VALIDATE_EMAIL))
+        return true;
+    else
+        return false;
+
+}
 
 function validarSenha($senha, $exigirMinuscula = false, $exigirMaiuscula = false, $exigirNumero = false, $exigirSimbolo = false, $minimoCaracteres = 8) {
     $regras = "";
@@ -91,7 +91,7 @@ if (!empty($_POST['email'])) {
     if (!$achou) {
         $senha_pura = $_POST['senha'];
         $confsenha_pura = $_POST['confsenha'];
-        
+    
         // Validação da força da senha
         if (!validarSenha($senha_pura, false, false, false, false, 8))
             $status = 3; // Senha fraca
@@ -105,32 +105,43 @@ if (!empty($_POST['email'])) {
             $nome = $_POST['nome'];
             $email = $_POST['email'];
             $senha = sha1(md5($senha_pura));
-            $whatsapp = $_POST['telefone'];
+            $telefone = $_POST['telefone'];
 
-            $sql = "INSERT INTO usuario (nome, email, senha, telefone) VALUES ('$nome', '$email', '$senha', '$whatsapp')";
-            $result = $mysqli->query($sql);
+            // Validação do email
+            if (!validaEmail($email))
+                $status = 5; // Email invalido
 
-            if ($result === TRUE) {
-                $status = 1;
-                $last_id = $mysqli->insert_id;
+            // Validação do telefone
+            if (!validaTelefone($telefone))
+                $status = 6; // Telefone invalido
 
-                // Início da Sessão
-                if (session_status() == PHP_SESSION_NONE) {
-                    session_start();
-                }
-                
-                $lifetime_in_seconds = 60; // 3 horas (ajustado de 10s para algo útil)
-                $_SESSION['start_time'] = time();
-                $_SESSION['expiry_time'] = time() + $lifetime_in_seconds;
-                $_SESSION['login'] = $email;
-                $_SESSION['senha'] = $senha;
-                $_SESSION['id'] = $last_id;
-                $_SESSION['idcliente_login'] = $last_id;
-                
-                $autorizado = true;
-            } else
-                echo "Erro no banco: " . $mysqli->error;
-            
+
+            if ($status==0)
+            {
+                $sql = "INSERT INTO usuario (nome, email, senha, telefone) VALUES ('$nome', '$email', '$senha', '$telefone')";
+                $result = $mysqli->query($sql);
+
+                if ($result === TRUE) {
+                    $status = 1;
+                    $last_id = $mysqli->insert_id;
+
+                    // Início da Sessão
+                    if (session_status() == PHP_SESSION_NONE) {
+                        session_start();
+                    }
+                    
+                    $lifetime_in_seconds = 60; // 3 horas (ajustado de 10s para algo útil)
+                    $_SESSION['start_time'] = time();
+                    $_SESSION['expiry_time'] = time() + $lifetime_in_seconds;
+                    $_SESSION['login'] = $email;
+                    $_SESSION['senha'] = $senha;
+                    $_SESSION['id'] = $last_id;
+                    $_SESSION['idcliente_login'] = $last_id;
+                    
+                    $autorizado = true;
+                } else
+                    echo "Erro no banco: " . $mysqli->error;
+            }
         }
     } else
         $status = 2; // Email já cadastrado

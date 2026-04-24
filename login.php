@@ -697,6 +697,22 @@ function cadastrar(){
                     icon: "error"
                 });
             }
+
+            if (response=='5'){
+                Swal.fire({
+                    title: "Email inválido",
+                    text: "Digite um email válido",
+                    icon: "error"
+                });
+            }
+
+            if (response=='6'){
+                Swal.fire({
+                    title: "Telefone inválido",
+                    text: "Digite um telefone válido",
+                    icon: "error"
+                });
+            }
         },
         error: function(error) {
           // Modal de Erro
