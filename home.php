@@ -3,6 +3,16 @@ session_start();
 include("config.php");
 include("restrito.php");
 
+$link_perfil="perfil.php";
+if ($login_usuario_id==1)
+    $link_perfil="superusuario.php";
+
+$dados=[];
+$sql2="select * from monitoramento m INNER JOIN camera c ON c.id_camera=m.id_camera INNER JOIN area a ON a.id_area=m.id_area;";
+$campos2 = $mysqli->query($sql2);
+while($obj2 = $campos2->fetch_object())
+    array_push($dados,(array) $obj2);
+
 
 ?>
 <!DOCTYPE html>
@@ -159,21 +169,12 @@ include("restrito.php");
             transform: translateY(-5px);
         }
 
-       .card-image {
+        .card-image {
             width: 100%;
             height: 100%;
-            /* Camada de gradiente escuro + Imagem */
-            background-image: 
-                linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.7) 100%), 
-                url('img/av-vidal.jpg'); 
+            background-image: url('./Img/av-vidal.jpg'); 
             background-size: cover;
             background-position: center;
-            transition: transform 0.6s ease;
-        }
-
-        /* Efeito de Zoom na foto ao passar o mouse */
-        .area-card:hover .card-image {
-            transform: scale(1.1);
         }
 
         /* Camada de labels sobre a imagem */
@@ -233,7 +234,7 @@ include("restrito.php");
                 <div class="logo-text">Vaga<span>Livre</span></div>
             </a>
             <div class="user-profile">
-                <a href="perfil.php" class="logo-container">
+                <a href="<?php echo $link_perfil ?>" class="logo-container">
                     <i class="fas fa-user-circle"></i>
                 </a>
             </div>
@@ -248,16 +249,18 @@ include("restrito.php");
                 <input type="text" id="searchInput" placeholder="Buscar área monitorada...">
             </div>
         <section class="grid-areas" id="gridAreas" style="margin-top: 40px;">
-    
-        <a href="visualizar_area.php" class="area-card" data-name="avenida vidal de negreiros">
+
+        <?php foreach ($dados as $key => $value){ ?>
+        <a href="visualizar_area.php?id=<?php echo $value['id_monitoramento'] ?>" class="area-card" data-name="">
             <div class="card-image"></div>
             <div class="card-labels">
-                <div class="location-tag">Avenida Vidal de Negreiros</div>
+                <div class="location-tag"><?php echo $value['localizacao'] ?></div>
                 <div class="action-icon">
                     <i class="fas fa-arrow-up-right-from-square"></i>
                 </div>
             </div>
         </a>
+        <?php } ?>
 
         <div id="no-results" style="display: none; text-align: center; padding: 40px; width: 100%; grid-column: 1 / -1; color: #999;">
             <i class="fas fa-search-minus" style="font-size: 40px; margin-bottom: 10px; display: block; color: var(--accent-green);"></i>

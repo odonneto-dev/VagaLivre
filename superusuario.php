@@ -9,6 +9,16 @@ if (!isset($_SESSION['id'])) {
     exit();
 }
 
+if ($login_usuario_id!=1)
+{
+    header("Location: perfil.php");
+    exit();
+}
+
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 $mensagem = "";
 
 // --- lógica de cadastro / update do super ---
@@ -17,6 +27,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['salvar_ponto'])) {
     $descricao = $mysqli->real_escape_string($_POST['descricao']);
     $endereco = $mysqli->real_escape_string($_POST['endereco']);
     $camera = $mysqli->real_escape_string($_POST['camera']);
+
+    $id_area=1;
+    $sql2="SELECT * FROM `consultas` ORDER BY id_consulta DESC LIMIT 1";
+    $campos2 = $mysqli->query($sql2);
+    while($obj2 = $campos2->fetch_object())
+        $id_area=$obj2->id_consulta;
+
+    $id_area++;
+    $sql="INSERT INTO consultas (id_area,id_usuario) VALUES ('".$id_area."',1)";
+    $mysqli->query($sql);
+
+    $sql="INSERT INTO area (id_area,descricao,endereco,nome_area) VALUES ('".$id_area."','".$descricao."','".$endereco."','".$nome_ponto."')";
+    $mysqli->query($sql);
+
+    $sql="INSERT INTO monitoramento (id_area,id_camera) VALUES ('".$id_area."','".$camera."')";
+    $mysqli->query($sql);
 
     $mensagem = "Ponto de monitoramento atualizado com sucesso!";
 }
@@ -192,9 +218,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['salvar_ponto'])) {
                         <label>Selecionar Dispositivo de Vídeo (Câmera)</label>
                         <select name="camera" required>
                             <option value="">Selecione uma câmera...</option>
-                            <option value="cam_01">Câmera Principal - Entrada</option>
-                            <option value="cam_02">Câmera Secundária - Fundos</option>
-                            <option value="cam_usb">Webcam USB Local</option>
+                            <option value="cam_01">Câmera 01 - Rua Pedro Firmino - Leste</option>
+                            <option value="cam_02">Câmera 02 - Rua Pedro Firmino - Oeste</option>
                         </select>
                     </div>
 
