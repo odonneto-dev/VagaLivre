@@ -251,7 +251,7 @@ while($obj2 = $campos2->fetch_object())
         <section class="grid-areas" id="gridAreas" style="margin-top: 40px;">
 
         <?php foreach ($dados as $key => $value){ ?>
-        <a href="visualizar_area.php?id=<?php echo $value['id_monitoramento'] ?>" class="area-card" data-name="">
+        <a href="visualizar_area.php?id=<?php echo $value['id_monitoramento'] ?>" class="area-card" data-name="<?php echo $value['localizacao'] ?>">
             <div class="card-image"></div>
             <div class="card-labels">
                 <div class="location-tag"><?php echo $value['localizacao'] ?></div>
