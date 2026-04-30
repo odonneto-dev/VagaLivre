@@ -7,7 +7,7 @@ $dados=[];
 $sql2="select * from monitoramento m INNER JOIN camera c ON c.id_camera=m.id_camera INNER JOIN area a ON a.id_area=m.id_area WHERE m.id_monitoramento=".$id_ref;
 $campos2 = $mysqli->query($sql2);
 while($obj2 = $campos2->fetch_object())
-    $avenida_nome=$obj2->localizacao;
+    $avenida_nome=$obj2->nome_area.' - '.$obj2->localizacao;
 
 $ultima_atualizacao = date("H:i:s");
 ?>

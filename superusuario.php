@@ -218,8 +218,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['salvar_ponto'])) {
                         <label>Selecionar Dispositivo de Vídeo (Câmera)</label>
                         <select name="camera" required>
                             <option value="">Selecione uma câmera...</option>
-                            <option value="cam_01">Câmera 01 - Rua Pedro Firmino - Leste</option>
-                            <option value="cam_02">Câmera 02 - Rua Pedro Firmino - Oeste</option>
+                            <option value="1">Câmera 01 - Rua Pedro Firmino - Leste</option>
+                            <option value="2">Câmera 02 - Rua Pedro Firmino - Oeste</option>
                         </select>
                     </div>
 
