@@ -578,7 +578,7 @@ if (!empty($_POST['email']))
             <input type="email" id="email" placeholder="Email" />
             <input type="password" id="senha" placeholder="Senha" />
             <input type="password" id="confsenha" placeholder="Confirmação de Senha" />
-            <input type="button" onclick="cadastrar();" value="Cadastrar"></input>
+            <button onclick="cadastrar();">Cadastrar</button>
         </form>
     </div>
 
