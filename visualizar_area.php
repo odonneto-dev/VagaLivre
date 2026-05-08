@@ -3,12 +3,18 @@ include("config.php");
 include("restrito.php"); 
 
 @$id_ref=$_GET['id'];
-$dados=[];
-$sql2="select * from monitoramento m INNER JOIN camera c ON c.id_camera=m.id_camera INNER JOIN area a ON a.id_area=m.id_area WHERE m.id_monitoramento=".$id_ref;
-$campos2 = $mysqli->query($sql2);
-while($obj2 = $campos2->fetch_object())
-    $avenida_nome=$obj2->nome_area.' - '.$obj2->localizacao;
+$sql2="select * from monitoramento m 
+       INNER JOIN camera c ON c.id_camera=m.id_camera 
+       INNER JOIN area a ON a.id_area=m.id_area 
+       WHERE m.id_monitoramento=".$id_ref;
 
+$campos2 = $mysqli->query($sql2);
+$area_id_atual = 0; 
+
+if($obj2 = $campos2->fetch_object()){
+    $avenida_nome = $obj2->nome_area.' - '.$obj2->localizacao;
+    $area_id_atual = $obj2->id_area; 
+}
 $ultima_atualizacao = date("H:i:s");
 ?>
 <!DOCTYPE html>
@@ -20,6 +26,7 @@ $ultima_atualizacao = date("H:i:s");
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/pinch-zoom-js@2.3.4/dist/pinch-zoom.umd.min.js"></script>
 
     <style>
         :root {
@@ -27,185 +34,143 @@ $ultima_atualizacao = date("H:i:s");
             --accent-green: #2ecc71;
             --accent-red: #e74c3c;
             --white: #FFFFFF;
-            --gray-bg: #f0f2f5;
+            --gray-bg: #f8fafc; /* Fundo mais suave */
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Montserrat', sans-serif; background: var(--gray-bg); overflow: hidden; height: 100vh; }
 
-        /* HEADER PADRONIZADO */
         .main-header { 
             position: fixed; top: 0; width: 100%; z-index: 1000;
             padding: 15px 20px; background: var(--white); border-bottom: 1px solid #eee;
             display: flex; align-items: center;
         }
-        
-        .btn-back {
-            color: var(--accent-green); /* SETINHA VERDE */
-            text-decoration: none;
-            font-size: 20px;
-            margin-right: 15px;
-        }
-
-        .logo-container { display: flex; align-items: center; text-decoration: none; }
-        
-        .logo-icon {
-            font-size: 22px; color: var(--primary-dark);
-            margin-right: 6px; position: relative;
-        }
-
-        /* O PINGO VERDE OFICIAL */
-        .logo-icon::after {
-            content: ''; position: absolute; top: 0; right: -2px; 
-            width: 6px; height: 6px; background-color: var(--accent-green);
-            border-radius: 50%; border: 2px solid var(--white);
-        }
-
+        .btn-back { color: var(--accent-green); text-decoration: none; font-size: 20px; margin-right: 15px; }
         .logo-text { font-size: 20px; font-weight: 800; color: var(--primary-dark); letter-spacing: -1px; }
-        .logo-text span { color: var(--accent-green); font-weight: 600; }
+        .logo-text span { color: var(--accent-green); }
 
-        /* BARRA DE ATUALIZAÇÃO */
         .update-bar {
             position: fixed; top: 62px; width: 100%; z-index: 999;
             background: var(--primary-dark); color: white;
             padding: 8px; text-align: center; font-size: 11px; font-weight: 600;
         }
-        .update-bar span { color: var(--accent-green); }
 
-        /* MAPA */
-        #map-container {
-            width: 100%; height: 100vh; position: relative; background: var(--gray-bg);
-            display: flex; align-items: center; justify-content: center;
-        }
-        .custom-map-svg { width: 150%; height: 150%; transform: rotate(-10deg); }
+        #pinch-wrapper { width: 100%; height: 100vh; background: #ebf0f5; display: flex; align-items: center; justify-content: center; }
+        #map-area { width: 100%; height: 100%; position: relative; }
 
-        /* PINS */
+        .custom-map-svg { width: 100%; height: 100%; }
+
         .pin {
-            position: absolute; width: 35px; height: 35px; border-radius: 50% 50% 50% 0;
+            position: absolute; width: 32px; height: 32px; border-radius: 50% 50% 50% 0;
             transform: rotate(-45deg); display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2); border: 2px solid white; cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1); border: 2px solid white; cursor: pointer; z-index: 100;
         }
-        .pin i { transform: rotate(45deg); color: white; font-size: 14px; }
+        .pin i { transform: rotate(45deg); color: white; font-size: 12px; }
         .pin.free { background: var(--accent-green); }
         .pin.occupied { background: var(--accent-red); }
-        .pin.user { 
-            background: #3498db; width: 16px; height: 16px; border: 2px solid white; 
-            border-radius: 50%; transform: none; cursor: default;
-        }
 
-        /* SIDEBAR / SHEET (DO INDEX) */
+        /* Estilo Suave para Referências e Nomes */
+        .map-label { fill: #64748b; font-weight: 700; font-size: 11px; text-transform: uppercase; }
+        .street-name { fill: #94a3b8; font-size: 12px; font-weight: 800; letter-spacing: 0.5px; }
+        .ref-box { fill: #e2e8f0; rx: 6; ry: 6; }
+
         .sidebar {
             position: fixed; bottom: 0; left: 0; width: 100%;
             background: white; border-radius: 25px 25px 0 0;
-            box-shadow: 0 -5px 20px rgba(0,0,0,0.15); z-index: 1100;
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            transform: translateY(100%); /* Começa escondida */
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.1); z-index: 1100;
+            transition: transform 0.4s ease; transform: translateY(100%);
         }
         .sidebar.visible { transform: translateY(0); }
-
-        .sheet-header { padding: 20px; border-bottom: 1px solid #f0f0f0; text-align: center; }
-        .drag-handle { width: 40px; height: 4px; background: #ddd; border-radius: 2px; margin: 0 auto 15px; }
+        .panel-content { padding: 20px; }
         
-        .panel-content { padding: 0 20px 30px; max-height: 70vh; overflow-y: auto; }
-        
-        .spot-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .spot-tag { background: #e8fcf0; color: #2ecc71; padding: 5px 12px; border-radius: 15px; font-size: 12px; font-weight: 700; }
-
-        /* CARROSSEL DE CÂMERAS */
         .camera-feed-container {
             width: 100%; height: 180px; background: #000; border-radius: 15px;
-            margin-bottom: 20px; position: relative; overflow: hidden;
+            margin-top: 15px; position: relative; overflow: hidden;
         }
-        .camera-slide {
-            position: absolute; width: 100%; height: 100%; object-fit: cover;
-            opacity: 0; transition: opacity 0.5s;
-        }
+        .camera-slide { position: absolute; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.5s; }
         .camera-slide.active { opacity: 1; }
-        .camera-overlay {
-            position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.5);
-            color: white; padding: 4px 10px; border-radius: 10px; font-size: 10px; z-index: 2;
-        }
-        .camera-overlay i { color: #ff4757; margin-right: 5px; }
-
-        .btn-action {
-            width: 100%; padding: 15px; background: var(--primary-dark);
-            color: white; border: none; border-radius: 15px; font-weight: 700; margin-bottom: 10px;
-        }
-        .btn-close {
-            width: 100%; padding: 12px; background: #f0f2f5;
-            color: #666; border: none; border-radius: 15px; font-weight: 600;
-        }
+        .btn-close { width: 100%; padding: 12px; background: #f1f5f9; border: none; border-radius: 15px; font-weight: 700; margin-top: 15px; color: #475569; }
     </style>
 </head>
 <body>
 
     <header class="main-header">
         <a href="home.php" class="btn-back"><i class="fas fa-arrow-left"></i></a>
-        <div class="logo-container">
-            <div class="logo-icon"><i class="fa-solid fa-car-side"></i></div>
-            <div class="logo-text">Vaga<span>Livre</span></div>
-        </div>
-        <div style="margin-left: auto; font-weight: 700; font-size: 12px; color: #000;">
-            <?php echo $avenida_nome; ?>
-        </div>
+        <div class="logo-text">Vaga<span>Livre</span></div>
+        <div style="margin-left: auto; font-size: 10px; font-weight: 700; color: #94a3b8;"><?php echo $avenida_nome; ?></div>
     </header>
 
-    <div class="update-bar">
-        <i class="fas fa-sync-alt fa-spin"></i> Atualização: <span><?php echo $ultima_atualizacao; ?></span>
-    </div>
+    <div class="update-bar">Atualização: <span><?php echo $ultima_atualizacao; ?></span></div>
 
-    <div id="map-container">
-        <svg class="custom-map-svg" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice">
-            <rect width="200" height="200" fill="#e3e8ee"/>
-            <path d="M40 -10 L160 210" stroke="white" stroke-width="25"/> 
-        </svg>
+    <div id="pinch-wrapper">
+        <div id="map-area">
+            <svg class="custom-map-svg" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice">
+                <rect x="0" y="0" width="1000" height="1000" fill="#ebf0f5"/>
+                
+                <!-- Desenho das Ruas  -->
+                <path d="M420 -100 L580 1100" stroke="#f8fafc" stroke-width="80" fill="none" /> <!-- R. Darcílio -->
+                <path d="M-100 880 L1100 380" stroke="#f8fafc" stroke-width="100" fill="none" /> <!-- Av. Vidal -->
 
-        <div class="pin user" style="top:60%; left:55%;"></div>
+                <text x="400" y="625" class="street-name" transform="rotate(-24, 500, 625)">AVENIDA VIDAL DE NEGREIROS</text>
+                <text x="512" y="300" class="street-name" transform="rotate(82, 472, 285)">RUA DARCÍLIO VANDERLEY</text>
 
-        <div class="pin free" style="top:25%; left:38%;" onclick="verDetalhes('Vaga #101', 'LIVRE')"><i class="fas fa-check"></i></div>
-        <div class="pin occupied" style="top:40%; left:50%;" onclick="verDetalhes('Vaga #102', 'OCUPADA')"><i class="fas fa-times"></i></div>
-        <div class="pin free" style="top:55%; left:62%;" onclick="verDetalhes('Vaga #103', 'LIVRE')"><i class="fas fa-check"></i></div>
+                <!-- Referências Visuais  -->
+                <!-- LADO ESQUERDO -->
+                <rect x="110" y="470" width="160" height="40" class="ref-box" />
+                <text x="130" y="495" class="map-label">🏢 Unniter</text>
+                
+                <rect x="290" y="910" width="100" height="40" class="ref-box" />
+                <text x="310" y="935" class="map-label">🍴 Sakê</text>
+
+                <!-- LADO DIREITO -->
+                <rect x="710" y="260" width="190" height="45" class="ref-box" />
+                <text x="730" y="288" class="map-label">📍 Jessyellen P.</text>
+
+                <rect x="790" y="670" width="180" height="45" class="ref-box" />
+                <text x="805" y="698" class="map-label">📐 Jayny Gomes Arq.</text>
+            </svg>
+
+            <!-- PINS ÁREA 1 -->
+            <?php if ($area_id_atual == 1): ?>
+                <div class="pin free" style="top:74%; left:25%;" onclick="verDetalhes('Vaga #01', 'LIVRE')"><i class="fas fa-check"></i></div>
+                <div class="pin occupied" style="top:69%; left:38%;" onclick="verDetalhes('Vaga #02', 'OCUPADA')"><i class="fas fa-times"></i></div>
+            
+            <!-- PINS ÁREA 2 -->
+            <?php else: ?>
+                <div class="pin free" style="top:47%; left:53%;" onclick="verDetalhes('Vaga #08', 'LIVRE')"><i class="fas fa-check"></i></div>
+                <div class="pin occupied" style="top:58%; left:68%;" onclick="verDetalhes('Vaga #09', 'OCUPADA')"><i class="fas fa-times"></i></div>
+                <div class="pin free" style="top:52%; left:82%;" onclick="verDetalhes('Vaga #10', 'LIVRE')"><i class="fas fa-check"></i></div>
+            <?php endif; ?>
+        </div>
     </div>
 
     <div class="sidebar" id="detailsSidebar">
-    <div class="sheet-header">
-        <div class="drag-handle"></div>
-    </div>
-    <div class="panel-content">
-        <div class="spot-header">
-            <div>
-                <h2 id="spotTitle" style="font-size:20px; color:#000;">Vaga</h2>
-                <span style="font-size:12px; color:#666;">Av. Vidal de Negreiros</span>
+        <div class="panel-content">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h2 id="spotTitle" style="font-size:22px; color:var(--primary-dark);">Vaga</h2>
+                <div id="spotStatus" style="font-weight:800; padding:5px 15px; border-radius:20px;">LIVRE</div>
             </div>
-            <div id="spotStatus" class="spot-tag">LIVRE</div>
-        </div>
 
-        <div class="camera-feed-container">
-            <div class="camera-overlay"><i class="fas fa-circle"></i> AO VIVO</div>
-            <img src="Img/image_0.png" class="camera-slide active" alt="Cam 1">
-            <img src="Img/image_1.png" class="camera-slide" alt="Cam 2">
-            <img src="Img/image_2.png" class="camera-slide" alt="Cam 3">
-        </div>
+            <div class="camera-feed-container">
+                <img src="Img/image_0.png" class="camera-slide active" alt="Cam 1">
+                <img src="Img/image_1.png" class="camera-slide" alt="Cam 2">
+            </div>
 
-        <div style="margin-bottom:20px; color:#555; font-size:13px;">
-            <p style="margin-bottom:5px;"><i class="fas fa-info-circle"></i> Monitorada por sensor infravermelho.</p>
-            <p><i class="fas fa-clock"></i> Tempo sugerido: 60 min.</p>
+            <button class="btn-close" onclick="fecharDetalhes()">Fechar</button>
         </div>
-
-        <button class="btn-close" onclick="fecharDetalhes()">Fechar</button>
-    </div>
     </div>
 
     <script>
+        const el = document.getElementById('map-area');
+        new PinchZoom(el, { draggableUnzoomed: true, minZoom: 1, maxZoom: 4 });
+
         let slideInterval;
         let currentSlide = 0;
 
         function verDetalhes(titulo, status) {
             document.getElementById('spotTitle').innerText = titulo;
-            document.getElementById('spotStatus').innerText = status;
-            
-            // Ajusta cor da tag se estiver ocupada
             const tag = document.getElementById('spotStatus');
+            tag.innerText = status;
             tag.style.background = (status === 'LIVRE') ? '#e8fcf0' : '#ffebeb';
             tag.style.color = (status === 'LIVRE') ? '#2ecc71' : '#e74c3c';
 
@@ -226,13 +191,8 @@ $ultima_atualizacao = date("H:i:s");
                 slides[currentSlide].classList.remove('active');
                 currentSlide = (currentSlide + 1) % slides.length;
                 slides[currentSlide].classList.add('active');
-            }, 2000);
+            }, 2500);
         }
-
-        // Fecha ao clicar no mapa
-        document.getElementById('map-container').addEventListener('click', (e) => {
-            if (!e.target.closest('.pin')) fecharDetalhes();
-        });
     </script>
 </body>
 </html>
