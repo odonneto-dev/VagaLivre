@@ -13,6 +13,10 @@ if (isset($_GET['token'])) {
         $achou = true;
     }
 }
+
+$tokenexpirado=false;
+if (!$achou && isset($_GET['token']))
+    $tokenexpirado=true;
 ?>
 
 <!DOCTYPE html>
@@ -201,6 +205,24 @@ if (isset($_GET['token'])) {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script type="text/javascript">
+    <?php if ($tokenexpirado){ ?>
+        tokenexpirado();
+    <?php } ?>
+    function tokenexpirado(){
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'Token errado ou expirado, tente novamente!',
+          timer: 3000, // Tempo de 3 segundos (3000 milissegundos)
+          timerProgressBar: true, // Mostra a barra de progresso do tempo
+          confirmButtonText: 'OK',
+          willClose: () => {
+            // Executa o redirecionamento ao fechar (por clique ou por tempo)
+            window.location.href = './redefinirsenha.php';
+          }
+        });
+    }
+
     function salvar(){
         const nova_senha = document.getElementById('nova_senha').value;
         const confirmar_senha = document.getElementById('confirmar_senha').value;

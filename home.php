@@ -224,6 +224,11 @@ while($obj2 = $campos2->fetch_object())
             }
         }
     </style>
+
+    <!-- CSS do SweetAlert2 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+
 </head>
 <body>
 
@@ -231,11 +236,18 @@ while($obj2 = $campos2->fetch_object())
         <div class="container header-content">
             <a href="home.php" class="logo-container">
                 <i class="fas fa-car-side logo-icon"></i>
+         
+                
                 <div class="logo-text">Vaga<span>Livre</span></div>
             </a>
-            <div class="user-profile">
+            <div class="user-profile" style='right: 50px;position: absolute;'>
                 <a href="<?php echo $link_perfil ?>" class="logo-container">
                     <i class="fas fa-user-circle"></i>
+                </a>
+            </div>
+             <div class="user-profile" style='display:none'>
+                <a onclick='exibirPagamentoPix();' class="logo-container">
+                    <i class="fas fa fa-usd"></i>
                 </a>
             </div>
         </div>
@@ -251,7 +263,7 @@ while($obj2 = $campos2->fetch_object())
         <section class="grid-areas" id="gridAreas" style="margin-top: 40px;">
 
         <?php foreach ($dados as $key => $value){ ?>
-        <a href="visualizar_area.php?id=<?php echo $value['id_monitoramento'] ?>" class="area-card" data-name="<?php echo $value['nome_area'].' ('.$value['localizacao'].')'  ?>">
+        <a href="./?id=<?php echo $value['id_monitoramento'] ?>" class="area-card" data-name="<?php echo $value['nome_area'].' ('.$value['localizacao'].')'  ?>">
             <div class="card-image"></div>
             <div class="card-labels">
                 <div class="location-tag"><?php echo $value['nome_area'].' ('.$value['localizacao'].')' ?></div>
@@ -271,8 +283,101 @@ while($obj2 = $campos2->fetch_object())
 
     </main>
 
+    <!-- JS do SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
+        const exibirPagamentoPix = () => {
+            Swal.fire({
+                title: 'Pagamento via PIX',
+                text: 'Informe o valor:',
+                input: 'number',
+                inputAttributes: { min: "0.01", step: "0.01" },
+                showCancelButton: true,
+                confirmButtonText: 'Gerar QR Code',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#32bcad'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                const valor = result.value;
+                const chaveSimulada = "00020126580014br.gov.bcb.pix0136suachavepixaqui252004000053039865404" + valor + "5802BR5913NOME_RECEBEDOR6008CIDADE62070503***6304ABCD";
+
+                Swal.fire({
+                    title: 'Aguardando Pagamento',
+                    html: `
+                    <div style="text-align: center;">
+                        <p>Escaneie o QR Code ou copie o código abaixo:</p>
+                        
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${chaveSimulada}" 
+                            style="margin-bottom: 15px; border: 1px solid #eee; padding: 5px; border-radius: 8px;">
+
+                        <!-- Área Copia e Cola -->
+                        <div style="margin-top: 10px;">
+                        <textarea id="pixCode" readonly 
+                            style="width: 100%; height: 60px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; background: #f9f9f9; font-family: monospace; font-size: 12px; resize: none;"
+                        >${chaveSimulada}</textarea>
+                        
+                        <button onclick="copyPix()" id="btnCopy" 
+                            style="margin-top: 8px; padding: 8px 15px; background: #32bcad; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%;">
+                            Copiar Código Pix
+                        </button>
+                        </div>
+
+                        <!-- Spinner -->
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 25px;">
+                        <div class="pix-spinner"></div>
+                        <span style="font-size: 0.85em; color: #777;">Processando pagamento...</span>
+                        </div>
+                    </div>
+                    `,
+                    showConfirmButton: false,
+                    showCloseButton: true,
+                    footer: '<a href="javascript:void(0)" onclick="Swal.close()" style="color: #d33; text-decoration: none;">Cancelar Transação</a>',
+                    didOpen: () => {
+                    // CSS do Spinner injetado dinamicamente
+                    if (!document.getElementById('pix-style')) {
+                        const style = document.createElement('style');
+                        style.id = 'pix-style';
+                        style.innerHTML = `
+                        .pix-spinner {
+                            width: 30px;
+                            height: 30px;
+                            border: 3px solid #f3f3f3;
+                            border-top: 3px solid #32bcad;
+                            border-radius: 50%;
+                            animation: spin 1s linear infinite;
+                        }
+                        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+                        `;
+                        document.head.appendChild(style);
+                    }
+                    }
+                });
+                }
+            });
+            };
+
+            // Função auxiliar para copiar o texto
+            window.copyPix = () => {
+            const copyText = document.getElementById("pixCode");
+            const btn = document.getElementById("btnCopy");
+            
+            copyText.select();
+            copyText.setSelectionRange(0, 99999); // Para mobile
+            navigator.clipboard.writeText(copyText.value);
+            
+            btn.innerText = "✓ Copiado!";
+            btn.style.background = "#28a745";
+            
+            setTimeout(() => {
+                btn.innerText = "Copiar Código Pix";
+                btn.style.background = "#32bcad";
+            }, 2000);
+            };
+
+
+
+
         const searchInput = document.getElementById('searchInput');
         const cards = document.querySelectorAll('.area-card');
         const noResults = document.getElementById('no-results');
