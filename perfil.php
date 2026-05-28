@@ -48,7 +48,7 @@ $user = $result->fetch_assoc();
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;800&display=swap" rel="stylesheet">
 
     <style>
-        /* váriaveis */
+        /* VARIÁVEIS EXATAMENTE IGUAIS À HOME */
         :root {
             --primary-dark: #2b5876;
             --accent-green: #2ecc71;
@@ -71,7 +71,7 @@ $user = $result->fetch_assoc();
             padding: 0 20px;
         }
 
-        /* header padrão */
+        /* HEADER IDENTICO À HOME */
         .main-header {
             padding: 15px 0;
             border-bottom: 1px solid #eee;
@@ -122,7 +122,7 @@ $user = $result->fetch_assoc();
             color: var(--accent-green);
         }
 
-        /* conteúdo do perfil */
+        /* CONTEÚDO ESPECÍFICO DO PERFIL */
         .content {
             display: flex;
             flex-direction: column;
@@ -286,3 +286,27 @@ $user = $result->fetch_assoc();
 
 </body>
 </html>
+
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script type="text/javascript">
+<?php if (isset($_GET['atualizado'])){ ?>
+    atualizado();
+<?php } ?>
+function atualizado(){
+    Swal.fire({
+        icon: 'success',
+        title: 'Tudo certo !',
+        text: 'Dados alterados com sucesso!',
+        timer: 3000, // Tempo de 3 segundos (3000 milissegundos)
+        timerProgressBar: true, // Mostra a barra de progresso do tempo
+        confirmButtonText: 'OK',
+        willClose: () => {
+        // Executa o redirecionamento ao fechar (por clique ou por tempo)
+        window.location.href = './home.php';
+        }
+    });
+}
+</script>

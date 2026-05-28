@@ -79,6 +79,10 @@ $ultima_atualizacao = date("H:i:s");
             height: 100vh;
             margin: 0;
             overflow: hidden; /* Evitamos assim o  scroll indesejado na animação */
+            max-width: 430px;
+            position: absolute;
+            left: 50%;
+            margin-left: -195px;
         }
 
 
@@ -88,10 +92,13 @@ $ultima_atualizacao = date("H:i:s");
         .refbox { fill: #e2e8f0; rx: 6; ry: 6; } 
 
         .logo-container {
-            display: flex;
+            display: contents;
             align-items: center;
             justify-content: center;
             margin-bottom: 15px;
+            position: fixed;
+            left: 53px;
+            top: 16px;
         }
         .logo-icon {
             font-size: 24px;
@@ -148,7 +155,7 @@ $ultima_atualizacao = date("H:i:s");
         }
         
         h1 { margin: 0; font-size: 24px; }
-        p { font-size: 14px; font-weight: 100; line-height: 20px; letter-spacing: 0.5px; margin: 20px 0 30px; }
+        p { font-size: 14px; font-weight: 100; line-height: 20px; letter-spacing: 0.5px; margin: 15px 0 20px; }
         span.sub-text { font-size: 12px; margin-bottom: 10px; }
         
         input {
@@ -467,7 +474,7 @@ $ultima_atualizacao = date("H:i:s");
 
         /* HEADER PADRONIZADO */
         .main-header { 
-            position: fixed; top: 0; width: 100%; z-index: 1000;
+            position: absolute; top: 0; width: 100%; z-index: 1000;
             padding: 15px 20px; background: var(--white); border-bottom: 1px solid #eee;
             display: flex; align-items: center;
             height: 60px;
@@ -480,7 +487,7 @@ $ultima_atualizacao = date("H:i:s");
             margin-right: 15px;
         }
 
-        .logo-container { display: flex; align-items: center; text-decoration: none; }
+        .logo-container { display: contents; align-items: center; text-decoration: none; }
         
         .logo-icon {
             font-size: 22px; color: var(--primary-dark);
@@ -499,7 +506,7 @@ $ultima_atualizacao = date("H:i:s");
 
         /* BARRA DE ATUALIZAÇÃO */
         .update-bar {
-            position: fixed; top: 62px; width: 100%; z-index: 999;
+            position: absolute; top: 62px; width: 100%; z-index: 999;
             background: var(--primary-dark); color: white;
             padding: 8px; text-align: center; font-size: 11px; font-weight: 600;
         }
@@ -513,7 +520,7 @@ $ultima_atualizacao = date("H:i:s");
         }
 
         .main-header { 
-            position: fixed; top: 0; width: 100%; z-index: 1000;
+            position: absolute; top: 0; width: 100%; z-index: 1000;
             padding: 15px 20px; background: var(--white); border-bottom: 1px solid #eee;
             display: flex; align-items: center;
         }
@@ -522,7 +529,7 @@ $ultima_atualizacao = date("H:i:s");
         .logo-text span { color: var(--accent-green); }
 
         .update-bar {
-            position: fixed; top: 62px; width: 100%; z-index: 999;
+            position: absolute; top: 62px; width: 100%; z-index: 999;
             background: var(--primary-dark); color: white;
             padding: 8px; text-align: center; font-size: 11px; font-weight: 600;
         }
@@ -547,10 +554,10 @@ $ultima_atualizacao = date("H:i:s");
         .refbox { fill: #e2e8f0; rx: 6; ry: 6; }
 
         .sidebar {
-            position: fixed; bottom: 0; left: 0; width: 100%;
+            position: absolute; bottom: 0; left: 0; width: 100%;
             background: white; border-radius: 25px 25px 0 0;
             box-shadow: 0 -5px 20px rgba(0,0,0,0.1); z-index: 1100;
-            transition: transform 0.4s ease; transform: translateY(100%);
+            trssansition: transform 0.4s ease; transadadssform: translateY(100%);
         }
         .sidebar.visible { transform: translateY(0); }
         .panel-content { padding: 20px; }
@@ -599,7 +606,7 @@ $ultima_atualizacao = date("H:i:s");
             
         </svg>
 
-        <div class="map-label" style="top:34%; left:25%; transform:rotate(80deg); font-size: 10px; color:#5a6d7e;"><?php echo $rua ?></div>
+        <div class="map-label" style="top:34%; left:27%; transform:rotate(80deg); font-size: 10px; color:#5a6d7e;"><?php echo $rua ?></div>
         <div class="map-label" style="top:47%; left:7%; transform:rotate(10deg);">Av. Vidal de Negreiros</div>
     </div>  
 
@@ -609,7 +616,7 @@ $ultima_atualizacao = date("H:i:s");
             <div class="search-wrapper">
                 <div class="search-container">
                     <i class="fas fa-search"></i>
-                    <input type="text" id="searchInput" placeholder="Para onde vamos hoje?">
+                    <input type="text" id="searchInput" placeholder="">
                 </div>
             </div>
         </div>
@@ -629,7 +636,7 @@ $ultima_atualizacao = date("H:i:s");
 
             <div id="details-view">
                 <div class="spot-header">
-                    <div><h2 id="spot-title" style="margin:0; font-size:22px; color:#333;">Vaga</h2><span style="font-size:12px; color:#666;"><?php echo $rua ?></span></div>
+                    <div><h2 id="spot-title" style="margin:0; font-size:14px; color:#333;">Vaga</h2><span style="font-size:12px; color:#666;"><?php echo $rua ?></span></div>
                     <div class="spot-tag">LIVRE</div>
                 </div>
                 
@@ -847,15 +854,16 @@ $ultima_atualizacao = date("H:i:s");
         // Gerencia os estados
         function setSidebarState(state) {
             sidebar.classList.remove('collapsed', 'half-expanded', 'full-expanded');
-            if (state === 'collapsed') {
+            if (state === 'collapsed')  {
                 sidebar.classList.add('collapsed');
-                searchInput.blur();
+                //searchInput.blur();
                 stopCameraCarousel(); // PARAR ANIMAÇÃO
                 setTimeout(() => { if(sidebar.classList.contains('collapsed')) showListView(); }, 300);
             } else if (state === 'half') {
-                sidebar.classList.add('half-expanded');
+                 sidebar.classList.add('collapsed');
+                //searchInput.blur();
                 stopCameraCarousel(); // PARAR ANIMAÇÃO
-                showListView();
+                setTimeout(() => { if(sidebar.classList.contains('collapsed')) showListView(); }, 300);
             } else if (state === 'full') {
                 sidebar.classList.add('full-expanded');
                 // Dispara para animação começar na função openSpotDetails
@@ -886,7 +894,7 @@ $ultima_atualizacao = date("H:i:s");
         }
 
         // Parte dos eventos
-        searchInput.addEventListener('focus', () => { setSidebarState('half'); });
+        //searchInput.addEventListener('focus', () => { setSidebarState('half'); });
         mapContainer.addEventListener('click', (e) => {
             if (!e.target.closest('.pin')) { setSidebarState('collapsed'); }
         });
@@ -907,7 +915,7 @@ $ultima_atualizacao = date("H:i:s");
 
         setInterval(() => {
             att();
-        }, 555000);
+        }, 2000);
     </script>
 </body>
 </html>

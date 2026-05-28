@@ -92,8 +92,8 @@ if (!empty($_POST['email']))
             @session_destroy();
            
             $autorizado = true;
-            $lifetime_in_seconds = 60; // 3 horas
-            ini_set('session.gc_maxlifetime', 60); 
+            $lifetime_in_seconds = 3000; // 3 horas
+            ini_set('session.gc_maxlifetime', 3000); 
             // session_set_cookie_params($lifetime_in_seconds);
             // setcookie(session_name(), session_id(), time() + $lifetime_in_seconds);
 
