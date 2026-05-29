@@ -86,8 +86,7 @@ if (!empty($_POST['email'])) {
     if ($campos && $campos->num_rows > 0)
         $achou = true;
 
-    $achou = false;
-
+    
     if (!$achou) {
         $senha_pura = $_POST['senha'];
         $confsenha_pura = $_POST['confsenha'];
